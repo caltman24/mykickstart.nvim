@@ -3,8 +3,6 @@
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
 ========         |.-""""""""""""""""""-.|   |-----|          ========
 ========         ||                    ||   | === |          ========
 ========         ||   KICKSTART.NVIM   ||   |-----|          ========
@@ -161,6 +159,14 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+-- Set the shell to use Powershell
+vim.o.shell = 'powershell.exe'
+vim.o.shellcmdflag = '-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;'
+vim.o.shellredir = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
+vim.o.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
+vim.o.shellquote = ''
+vim.o.shellxquote = ''
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -274,6 +280,27 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = function()
+      require('toggleterm').setup {
+        size = 10,
+        open_mapping = [[<c-\>]],
+        direction = 'float',
+        float_opts = {
+          border = 'curved',
+          title_pos = 'left',
+        },
+      }
+
+      vim.api.nvim_create_user_command('TermNew', function()
+        term = require('toggleterm.terminal').Terminal:new {}
+        term:spawn()
+        term:toggle()
+      end, { bang = true })
+    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
