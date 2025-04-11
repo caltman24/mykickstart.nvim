@@ -297,6 +297,13 @@ require('lazy').setup({
     end,
   },
   {
+    'GustavEikaas/easy-dotnet.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    config = function()
+      require('easy-dotnet').setup()
+    end,
+  },
+  {
     'akinsho/toggleterm.nvim',
     version = '*',
     config = function()
@@ -907,8 +914,15 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'easy-dotnet' },
         providers = {
+          ['easy-dotnet'] = {
+            name = 'easy-dotnet',
+            enabled = true,
+            module = 'easy-dotnet.completion.blink',
+            score_offset = 10000,
+            async = true,
+          },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
       },
@@ -1027,10 +1041,10 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
@@ -1065,6 +1079,78 @@ require('lazy').setup({
     },
   },
 })
+local M = {}
+
+--- Rebuilds the project before starting the debug session
+---@param co thread
+local function rebuild_project(co, path)
+  local spinner = require('easy-dotnet.ui-modules.spinner').new()
+  spinner:start_spinner 'Building'
+  vim.fn.jobstart(string.format('dotnet build %s', path), {
+    on_exit = function(_, return_code)
+      if return_code == 0 then
+        spinner:stop_spinner 'Built successfully'
+      else
+        spinner:stop_spinner('Build failed with exit code ' .. return_code, vim.log.levels.ERROR)
+        error 'Build failed'
+      end
+      coroutine.resume(co)
+    end,
+  })
+  coroutine.yield()
+end
+
+M.register_net_dap = function()
+  local dap = require 'dap'
+  local dotnet = require 'easy-dotnet'
+  local debug_dll = nil
+
+  local function ensure_dll()
+    if debug_dll ~= nil then
+      return debug_dll
+    end
+    local dll = dotnet.get_debug_dll()
+    debug_dll = dll
+    return dll
+  end
+
+  for _, value in ipairs { 'cs', 'fsharp' } do
+    dap.configurations[value] = {
+      {
+        type = 'coreclr',
+        name = 'launch - netcoredbg',
+        request = 'launch',
+        env = function()
+          local dll = ensure_dll()
+          local vars = dotnet.get_environment_variables(dll.project_name, dll.relative_project_path)
+          return vars or nil
+        end,
+        program = function()
+          local dll = ensure_dll()
+          local co = coroutine.running()
+          rebuild_project(co, dll.project_path)
+          return dll.relative_dll_path
+        end,
+        cwd = function()
+          local dll = ensure_dll()
+          return dll.relative_project_path
+        end,
+      },
+    }
+  end
+
+  dap.listeners.before['event_terminated']['easy-dotnet'] = function()
+    debug_dll = nil
+  end
+
+  dap.adapters.coreclr = {
+    type = 'executable',
+    command = 'netcoredbg',
+    args = { '--interpreter=vscode' },
+  }
+end
+
+return M
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
