@@ -282,6 +282,11 @@ require('lazy').setup({
     },
   },
   {
+    'tpope/vim-fugitive',
+    version = '*',
+    config = function() end,
+  },
+  {
     'nvim-tree/nvim-tree.lua',
     version = '*',
     lazy = false,
