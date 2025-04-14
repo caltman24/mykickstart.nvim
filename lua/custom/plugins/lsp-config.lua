@@ -90,6 +90,8 @@ return {
         --  Similar to document symbols, except searches over your entire project.
         map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
 
+        vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = true, desc = 'Hover Documentation' })
+
         -- Jump to the type of the word under your cursor.
         --  Useful when you're not sure what type a variable is and you want to see
         --  the definition of its *type*, not where it was *defined*.
