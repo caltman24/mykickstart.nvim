@@ -206,7 +206,12 @@ return {
       -- But for many setups, the LSP (`ts_ls`) will work just fine
       -- ts_ls = {},
       --
-
+      omnisharp = {
+        capabilities = capabilities,
+        enable_import_completion = true,
+        organize_imports_on_format = true,
+        enable_roslyn_analyzers = true,
+      },
       lua_ls = {
         -- cmd = { ... },
         -- filetypes = { ... },
