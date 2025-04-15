@@ -184,5 +184,3 @@ require('lazy').setup({
     },
   },
 })
-
-require('custom.dap.dap-dotnet').dotnet_dap_config()
