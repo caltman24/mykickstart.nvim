@@ -38,3 +38,10 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 --
 vim.keymap.set('n', '<leader>pv', vim.cmd.Ex, { desc = 'Open [P]roject [V]iew' })
+
+-- Remap to center the screen when page up/down
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { noremap = true, silent = true })
+
+-- Greatest remap ever
+vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without yanking', noremap = true })
