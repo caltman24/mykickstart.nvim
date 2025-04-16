@@ -161,11 +161,18 @@ return {
       omnisharp = {
         capabilities = capabilities,
         settings = {
+          FormattingOptions = {
+            OrganizeImports = true,
+          },
           RoslynExtensionsOptions = {
             EnableRoslynAnalyzers = true,
-            OrganizeImportsOnFormat = true,
             EnableImportCompletion = true,
             EnableDecompilationSupport = true,
+            InlayHintsOptions = {
+              EnableForTypes = false,
+              ForImplicitVariables = false,
+              ForImplicitObjectCreation = false,
+            },
           },
         },
         filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
