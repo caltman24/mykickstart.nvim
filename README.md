@@ -21,14 +21,13 @@ chmod +x ~/.config/nvim/bootstrap-wsl.sh
 ~/.config/nvim/bootstrap-wsl.sh
 ```
 
-Node.js and npm must already be active in the shell before running the
-bootstrapper. This setup does not install Node.js or change your nvm
-configuration.
+Node.js, npm, and .NET must already be active in the shell before running the
+bootstrapper. This setup does not install or update them. It also leaves your
+nvm and .NET configuration alone.
 
 The installer restores the versions used on the source PC:
 
 - Neovim 0.12.3
-- .NET SDK 10.0.400
 - every plugin commit in `lazy-lock.json`
 - the pinned Mason language servers and formatters
 

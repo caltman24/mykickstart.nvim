@@ -3,7 +3,6 @@
 set -euo pipefail
 
 readonly NVIM_VERSION="v0.12.3"
-readonly DOTNET_VERSION="10.0.400"
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,6 +22,12 @@ fi
 if ! command -v node >/dev/null || ! command -v npm >/dev/null; then
   echo "Node.js and npm must already be available in this shell." >&2
   echo "Load your existing nvm environment, then rerun this script." >&2
+  exit 1
+fi
+
+if ! command -v dotnet >/dev/null; then
+  echo ".NET must already be available in this shell." >&2
+  echo "Install or load your existing .NET environment, then rerun this script." >&2
   exit 1
 fi
 
@@ -58,24 +63,13 @@ if [[ -e "$local_bin/nvim" && ! -L "$local_bin/nvim" ]]; then
 fi
 ln -sfn "$nvim_root/bin/nvim" "$local_bin/nvim"
 
-dotnet_root="$HOME/.dotnet"
-if [[ ! -x "$dotnet_root/dotnet" ]] || [[ "$($dotnet_root/dotnet --version)" != "$DOTNET_VERSION" ]]; then
-  dotnet_installer="$(mktemp)"
-  echo "Installing .NET SDK $DOTNET_VERSION..."
-  curl --fail --location --output "$dotnet_installer" https://dot.net/v1/dotnet-install.sh
-  bash "$dotnet_installer" --version "$DOTNET_VERSION" --install-dir "$dotnet_root"
-  rm -f "$dotnet_installer"
-fi
-
-shell_marker='# Neovim workstation bootstrap'
+shell_marker='# Neovim bootstrap path'
 if ! grep -Fq "$shell_marker" "$HOME/.bashrc"; then
   printf '\n%s\n' "$shell_marker" >> "$HOME/.bashrc"
-  printf 'export PATH="$HOME/.local/bin:$HOME/.dotnet:$PATH"\n' >> "$HOME/.bashrc"
-  printf 'export DOTNET_ROOT="$HOME/.dotnet"\n' >> "$HOME/.bashrc"
+  printf 'export PATH="$HOME/.local/bin:$PATH"\n' >> "$HOME/.bashrc"
 fi
 
-export DOTNET_ROOT="$dotnet_root"
-export PATH="$local_bin:$dotnet_root:$PATH"
+export PATH="$local_bin:$PATH"
 
 echo "Restoring plugins from lazy-lock.json..."
 nvim --headless "+Lazy! restore" +qa
