@@ -1,4 +1,49 @@
-# kickstart.nvim
+# Corbyn's Neovim
+
+This repository is the reproducible copy of my WSL2 Neovim setup. Plugin
+commits live in `lazy-lock.json`; Mason tools and their versions live in
+`lua/milkman/plugins/lsp-config.lua`.
+
+## Install on a new company PC
+
+The target environment is Ubuntu 24.04 under WSL2. From PowerShell, install
+WSL if it is not already available:
+
+```powershell
+wsl --install -d Ubuntu-24.04
+```
+
+Restart Windows if requested, open Ubuntu, and clone this repository:
+
+```sh
+git clone https://github.com/caltman24/mykickstart.nvim.git ~/.config/nvim
+chmod +x ~/.config/nvim/bootstrap-wsl.sh
+~/.config/nvim/bootstrap-wsl.sh
+```
+
+The installer restores the versions used on the source PC:
+
+- Neovim 0.12.3
+- Node.js 24.14.0 through nvm 0.40.1
+- .NET SDK 10.0.400
+- every plugin commit in `lazy-lock.json`
+- the pinned Mason language servers and formatters
+
+Do not copy `~/.local/share/nvim`, `~/.local/state/nvim`, or
+`~/.cache/nvim`. Those directories contain downloaded files, logs, history,
+and machine-specific state. The installer rebuilds them.
+
+### Match Windows Terminal
+
+Install the `Anonymice NF` Nerd Font on Windows. Then merge the properties in
+`windows-terminal-profile.json` into the Ubuntu profile in Windows Terminal's
+`settings.json`. This reproduces the current font, Tango Dark colors, 70%
+opacity, and acrylic background.
+
+After installation, open a new Ubuntu shell, run `nvim`, then run
+`:checkhealth` inside Neovim.
+
+## Kickstart reference
 
 ## Introduction
 
@@ -237,4 +282,3 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
 ```
 </details>
-

@@ -5,7 +5,15 @@ return {
     -- Automatically install LSPs and related tools to stdpath for Neovim
     -- Mason must be loaded before its dependents so we need to set it up here.
     -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-    { 'williamboman/mason.nvim', opts = {} },
+    {
+      'williamboman/mason.nvim',
+      opts = {
+        registries = {
+          'github:mason-org/mason-registry',
+          'github:crashdummyy/mason-registry',
+        },
+      },
+    },
     'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -158,25 +166,6 @@ return {
     --  - settings (table): Override the default settings passed when initializing the server.
     --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
     local servers = {
-      omnisharp = {
-        capabilities = capabilities,
-        settings = {
-          FormattingOptions = {
-            OrganizeImports = true,
-          },
-          RoslynExtensionsOptions = {
-            EnableRoslynAnalyzers = true,
-            EnableImportCompletion = true,
-            EnableDecompilationSupport = true,
-            InlayHintsOptions = {
-              EnableForTypes = false,
-              ForImplicitVariables = false,
-              ForImplicitObjectCreation = false,
-            },
-          },
-        },
-        filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
-      },
       lua_ls = {
         -- cmd = { ... },
         -- filetypes = { ... },
@@ -194,10 +183,20 @@ return {
     }
 
     -- Ensure the servers and tools above are installed
-    local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, {
-      'stylua', -- Used to format Lua code
-    })
+    -- Keep manually installed tools here as well. Pinning these versions makes a
+    -- fresh machine match this one instead of silently taking newer releases.
+    local ensure_installed = {
+      { 'astro-language-server', version = '2.16.10' },
+      { 'css-lsp', version = '4.10.0' },
+      { 'css-variables-language-server', version = '2.8.4' },
+      { 'json-lsp', version = '4.10.0' },
+      { 'lua-language-server', version = '3.18.2' },
+      { 'prettierd', version = '0.28.0' },
+      { 'roslyn', version = '5.10.0-1.26330.4' },
+      { 'stylua', version = 'v2.5.2' },
+      { 'tailwindcss-language-server', version = '0.14.29' },
+      { 'typescript-language-server', version = '5.3.0' },
+    }
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
     require('mason-lspconfig').setup {

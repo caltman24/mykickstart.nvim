@@ -33,3 +33,11 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt_local.colorcolumn = '100'
   end,
 })
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  desc = 'Remove carriage returns and save Unix line endings',
+  callback = function()
+    vim.bo.fileformat = 'unix'
+    vim.cmd [[silent! %s/\r//ge]]
+  end,
+})

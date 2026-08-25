@@ -1,0 +1,12 @@
+{
+  "adjustIndistinguishableColors": "never",
+  "colorScheme": "Tango Dark",
+  "font": {
+    "face": "Anonymice NF",
+    "size": 12.0,
+    "weight": "medium"
+  },
+  "intenseTextStyle": "all",
+  "opacity": 70,
+  "useAcrylic": true
+}

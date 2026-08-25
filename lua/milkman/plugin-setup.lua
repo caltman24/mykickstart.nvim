@@ -3,9 +3,19 @@
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then
     error('Error cloning lazy.nvim:\n' .. out)
+  end
+
+  local lockfile = vim.fn.stdpath 'config' .. '/lazy-lock.json'
+  local lock = vim.json.decode(table.concat(vim.fn.readfile(lockfile), '\n'))
+  local lazy_commit = lock['lazy.nvim'] and lock['lazy.nvim'].commit
+  if lazy_commit then
+    out = vim.fn.system { 'git', '-C', lazypath, 'checkout', lazy_commit }
+    if vim.v.shell_error ~= 0 then
+      error('Error pinning lazy.nvim:\n' .. out)
+    end
   end
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
